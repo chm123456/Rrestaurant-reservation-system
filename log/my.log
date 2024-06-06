@@ -1,0 +1,22 @@
+2023-09-03 03:13:48.027  INFO 52516 --- [main] com.example.Application                  : Starting Application on LAPTOP-OLTFUVBA with PID 52516 (E:\BaiduNetdiskDownload\restaurantReservationSystem\orderBoard\target\classes started by Chen Hongming in E:\BaiduNetdiskDownload\restaurantReservationSystem)
+2023-09-03 03:13:48.028  INFO 52516 --- [main] com.example.Application                  : No active profile set, falling back to default profiles: default
+2023-09-03 03:13:48.332  WARN 52516 --- [main] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.example]' package. Please check your configuration.
+2023-09-03 03:13:48.713  INFO 52516 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2023-09-03 03:13:48.726  INFO 52516 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-09-03 03:13:48.726  INFO 52516 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/9.0.12
+2023-09-03 03:13:48.730  INFO 52516 --- [main] o.a.catalina.core.AprLifecycleListener   : Loaded APR based Apache Tomcat Native library [1.2.31] using APR version [1.7.0].
+2023-09-03 03:13:48.730  INFO 52516 --- [main] o.a.catalina.core.AprLifecycleListener   : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-09-03 03:13:48.730  INFO 52516 --- [main] o.a.catalina.core.AprLifecycleListener   : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-09-03 03:13:48.738  INFO 52516 --- [main] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 1.1.1l  24 Aug 2021]
+2023-09-03 03:13:48.808  INFO 52516 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2023-09-03 03:13:48.808  INFO 52516 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 757 ms
+2023-09-03 03:13:48.822  INFO 52516 --- [main] o.s.b.w.servlet.ServletRegistrationBean  : Servlet dispatcherServlet mapped to [/]
+2023-09-03 03:13:48.825  INFO 52516 --- [main] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'characterEncodingFilter' to: [/*]
+2023-09-03 03:13:48.825  INFO 52516 --- [main] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+2023-09-03 03:13:48.825  INFO 52516 --- [main] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'formContentFilter' to: [/*]
+2023-09-03 03:13:48.825  INFO 52516 --- [main] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'requestContextFilter' to: [/*]
+2023-09-03 03:13:49.247  INFO 52516 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2023-09-03 03:13:49.382  INFO 52516 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2023-09-03 03:13:49.383  INFO 52516 --- [main] com.example.Application                  : Started Application in 1.585 seconds (JVM running for 2.239)
+2023-09-03 03:13:49.386  INFO 52516 --- [main] com.example.common.config.OpenBrowser    : 项目启动成功……
+2023-09-03 03:15:03.846  INFO 52516 --- [Thread-5] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'

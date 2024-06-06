@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>admin</title>
+    <link rel="stylesheet" href="/assets/css/element-ui.css">
+    <link rel="stylesheet" href="/assets/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/manager.css">
+
+</head>
+<body>
+<div id="app" v-cloak>
+
+    <!--头部-->
+    <div class="header" id="header"></div>
+    <!-- 中间部分-->
+    <div style="display: flex">
+        <!--菜单-->
+        <div id="main-menu"></div>
+
+        <!--主体-->
+        <div class="main-body">
+            <div class="main-body-header">admin</div>
+            <div class="main-body-content">
+                <div>
+					<el-input size="small" class="main-input" placeholder="please input name" v-model="search.yhm"></el-input>
+					<el-button size="small" type="info" @click="load()">search</el-button>
+					<el-button size="small" type="primary" v-if="permission.includes(101)" @click="add">create</el-button>
+
+                </div>
+                <div class="main-table-box">
+                    <el-table style="width: 100%" :data="tableData" size="small" strip header-cell-class-name="tableHeaderClass" >
+						<el-table-column label="name" prop="yhm"></el-table-column>
+						<el-table-column label="avatar">
+							<template v-slot="scope">
+								<el-image :src="scope.row.tx" :preview-src-list="[scope.row.tx]" style="width: 50px; height: 50px; border-radius: 50%"></el-image>
+							</template>
+						</el-table-column>
+						<el-table-column label="sex" prop="sex"></el-table-column>
+						<el-table-column label="phone" prop="phone"></el-table-column>
+                        <el-table-column label="operate" :width="colWidth" fixed="right">
+                            <template v-slot="scope">
+								<el-button size="small" type="primary" v-if="permission.includes(102)" @click="edit(scope.row)">edit</el-button>
+								<el-popconfirm title="Are you sure delete？" v-if="permission.includes(103)" @confirm="del(scope.row.id)"
+                                               confirm-button-text='OK'
+                                               cancel-button-text='No'
+                                >
+									<el-button size="small" type="danger" slot="reference">delete</el-button>
+								</el-popconfirm>
+
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                <div style="margin: 20px 0">
+                    <el-pagination
+                            background
+                            @current-change="handleCurrentChange"
+                            :current-page="pageNum"
+                            :page-size="5"
+                            layout="total, prev, pager, next"
+                            :total="total">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    页脚-->
+    <div>
+        <el-dialog title="Please input information" :visible.sync="dialogVisible" width="40%">
+            <el-form :model="form" label-position="right" label-width="100px" style="padding-right: 40px">
+				<el-form-item label="name">
+					<el-input size="small" v-model="form.yhm" placeholder="please input name"></el-input>
+				</el-form-item>
+				<el-form-item label="avatar">
+					<el-upload action="http://localhost:8080/files/upload" ref="tx" :on-success="txSuccessUpload">
+						<el-button size="small" type="success">click upload</el-button>
+					</el-upload>
+				</el-form-item>
+				<el-form-item label="sex">
+					<el-radio-group size="small" v-model="form.sex">
+						<el-radio label="male"></el-radio>
+						<el-radio label="female"></el-radio>
+					</el-radio-group>
+				</el-form-item>
+				<el-form-item label="phone">
+					<el-input size="small" v-model="form.phone" placeholder="please input phone"></el-input>
+				</el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button size="small" @click="dialogVisible = false">cancel</el-button>
+                <el-button size="small" type="primary" @click="save">save</el-button>
+            </div>
+        </el-dialog>
+
+
+    </div>
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script src="/assets/js/vue.js"></script>
+<script src="/assets/js/element-ui.min.js"></script>
+<script src="/assets/js/axios.js"></script>
+
+
+<script>
+// 管理员模块接口请求统一前缀
+let baseUrl = "/gly/"
+
+new Vue({
+    // el：Vue的作用域，对应html中 id=app 的元素
+    el: '#app',
+    // data：定义页面所有需要绑定的变量
+    data() {
+        return {
+            user: {},
+            authority: [],
+            permission: [],
+            colWidth: 150,
+            activeIndex: 'gly.html',
+            tableData: [],
+            pageNum: 1,
+            dialogVisible: false,
+
+
+            search: {},
+            form: {
+
+            },
+            total: 0,
+
+        }
+    },
+    // mounted：页面dom元素初始化好之后做的事情
+    mounted() {
+        this.user = JSON.parse(localStorage.getItem('user'));
+        // 获取当前登录用户对该模块的所有权限
+        this.getRolePermission(1);
+
+    },
+    // methods：本页面所有的点击事件或者其他函数定义区
+    methods: {
+        operationSpace() {
+            let width = 0
+            let _this = this
+            setTimeout(() => {
+                let rows = document.getElementsByClassName('el-table__row');
+                if (rows && rows.length) {
+                    let tds = rows[0].getElementsByTagName('td')
+                    let btns = tds[tds.length - 1].getElementsByTagName('button')
+                    for (let i = 0; i <btns.length; i++) {
+                        width += btns[i].offsetWidth + 5
+                    }
+                    _this.colWidth = width
+                }
+            }, 0)
+        },
+        // 获取当前登录用户的所有权限
+        getRolePermission(modelId) {
+            axios.get('/authority/' + modelId).then(res => {
+                if (res.data.code === "0") {
+                    this.authority = res.data.data.authority;
+                    this.permission = res.data.data.permission;
+                    // 开始分页加载表格数据，默认从第一页开始加载
+                    this.load()
+                } else {
+                    this.$notify.error(res.data.msg);
+                }
+            })
+        },
+        // 分页加载表格数据
+        load() {
+
+            axios.post(baseUrl + "page?pageNum=" + this.pageNum, this.search).then(res => {
+                if (res.data.code === '0') {
+                    this.tableData = res.data.data.list;
+                    this.total = res.data.data.total;
+                    this.operationSpace();
+                } else {
+                    this.$notify.error(res.data.msg);
+                }
+            });
+        },
+        // 新增初始化对话框
+        add() {
+            this.form = {};
+			this.$nextTick(() => {
+				this.$refs.tx.clearFiles()
+			});
+
+            this.dialogVisible = true;
+        },
+        // 编辑初始化模态框
+        edit(row) {
+            this.form = JSON.parse(JSON.stringify(row));
+			this.$nextTick(() => {
+				this.$refs.tx.clearFiles()
+			});
+
+            this.dialogVisible = true;
+        },
+
+        save() {
+
+            if (!this.form.id) {
+                // 没有ID，说明是新增操作
+                axios.post(baseUrl, this.form).then(res => {
+                    if (res.data.code === '0') {
+                        this.$notify.success('add success');
+                        this.dialogVisible = false;
+
+                        this.load();
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                })
+            } else {
+                // 有ID，说明是更新操作
+                axios.put(baseUrl, this.form).then(res => {
+                    if (res.data.code === '0') {
+                        this.$notify.success('edit success');
+                        this.dialogVisible = false;
+
+                        this.load();
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                })
+            }
+        },
+        // 根据ID删除某条数据
+        del(id) {
+            axios.delete(baseUrl + id).then(res => {
+                if (res.data.code === '0') {
+                    this.$notify.success('delete success');
+                    this.load();
+                } else {
+                    this.$notify.error(res.data.msg);
+                }
+            });
+        },
+		txSuccessUpload(res) {
+			this.form.tx = res.data;
+		},
+
+        handleCurrentChange(pageNum) {
+            this.pageNum = pageNum;
+            this.load();
+        },
+        selectMenu(index) {
+            location.href = index
+        }
+    }
+})
+</script>
+</body>
+</html>

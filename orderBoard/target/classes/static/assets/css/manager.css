@@ -1,0 +1,179 @@
+:root {
+    --primary: #5891aa;
+    --secondary: #a3a4a5;
+    --success: #00b179;
+    --info: #00bcd4;
+    --warning: #ff8300;
+    --danger: #f2125e;
+    --tableHeaderBg: #f8f7fc;
+    --tableHeaderColor: #323232
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: #eff2fa;
+    font-size: 14px;
+    color: #666;
+    font-family: "Microsoft YaHei UI";
+}
+a {
+    text-decoration: none;
+    color: white;
+}
+[v-cloak] {
+    display: none;
+}
+
+.header {
+    height: 60px;
+    line-height: 60px;
+    padding-left: 30px;
+    background: linear-gradient(to right, #2ebf91, #8360c3);
+    display: flex;
+}
+.header-left {
+    width: 200px;
+    color: #dfd;
+    font-size: 14px;
+    font-weight: bolder;
+}
+.header-center {
+    flex: 1;
+    color: #dfd;
+}
+.header-right {
+    width: 60px;
+}
+.avatar-box {
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+.header-right img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+.el-submenu__icon-arrow {
+    margin-top: -5px;
+}
+.el-submenu__title {
+    height: 40px;
+    line-height: 40px;
+    color: #323232;
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+.el-menu-item {
+    height: 40px !important;
+    line-height: 40px !important;
+    color: #323232;
+    padding-left: 52px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+.el-menu-item:hover, .el-submenu__title:hover {
+    background-color: #f0f0f0 !important;
+}
+.el-menu-item.is-active {
+    color: #2ebf91;
+    font-weight: 600;
+    padding-left: 52px !important;
+}
+.main-nav {
+    width: 200px;
+    height: 100%;
+}
+.main-nav-menu {
+    background-color: white;
+    min-height: calc(100vh - 60px);
+    border: none;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+    height: 100%;
+}
+.main-body {
+    flex: 1;
+    padding: 20px;
+    width: 0;
+}
+.main-body-header {
+    background-color: white;
+    height: 50px;
+    line-height: 50px;
+    padding-left: 20px;
+    font-weight: 700;
+    font-size: 16px;
+    border-left: 3px solid #2ebf91
+}
+.main-body-content {
+    background-color: white;
+    margin: 20px 0;
+    padding: 10px;
+}
+.main-table-box {
+    margin-top: 10px;
+    width: calc(100vw - 260px);
+}
+.el-table th.el-table__cell.is-leaf {
+    border-bottom: 2px solid #dee2e6;
+}
+.main-input {
+    width: 150px;
+    margin-right: 5px !important;
+}
+.el-input__inner {
+    border: 1px solid #ced4da !important;
+}
+.el-textarea__inner {
+    border: 1px solid #ced4da !important;
+    font-family: "Microsoft YaHei UI";
+}
+.el-button--primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+.el-button--danger {
+    background-color: var(--danger) !important;
+    border-color: var(--danger) !important;
+}
+.el-button--success {
+    background-color: var(--success) !important;
+    border-color: var(--success) !important;
+}
+.el-button--info {
+    background-color: var(--info) !important;
+    border-color: var(--info) !important;
+}
+.el-button--warning {
+    background-color: var(--warning) !important;
+    border-color: var(--warning) !important;
+}
+.el-button {
+    margin-left: 5px !important;
+}
+.el-pager li:not(.disabled).active {
+    background-color: var(--primary) !important;
+}
+.el-form-item {
+    margin-bottom: 5px !important;
+}
+.el-table .cell {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.el-table__row .el-button {
+    margin: 0 2px !important;
+}
+.el-notification__content {
+    margin: 0;
+}
+.el-notification__group {
+    display: flex;
+    align-items: center;
+}
+.tableHeaderClass{
+    background-color: var(--tableHeaderBg) !important;
+    color: var(--tableHeaderColor)
+}

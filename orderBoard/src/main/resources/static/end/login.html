@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/assets/css/element-ui.css">
+    <link rel="stylesheet" href="/assets/css/global.css">
+    <style>
+        body {
+            height: 100vh;/* Set the height of the body to 100% of the viewport height */
+            overflow: hidden;  /* Hide the overflow content of the body */
+            background-image: url("../assets/imgs/bg.jpg");   /* Set the background image of the body */
+            background-size: 100%;   /* Scale the background image to cover the entire body */
+            display: flex;
+            align-items: center;
+            justify-content: center;  /* Center the content vertically and horizontally */
+        }
+
+        .form-box {
+            width: 350px;    /* Set the width of the form box */
+            padding: 20px 40px;   /* Set the padding inside the form box */
+            border-radius: 2px;    /* Set the border radius of the form box */
+            background-color: #ffffff;  /* Set the background color of the form box */
+            opacity: .9;    /* Set the opacity of the form box */
+        }
+
+        .el-input__inner {
+            border-color: #ccc !important;
+            border-radius: 2px;
+            background-color: #ffffff !important;
+            color: #333;
+        }
+        .el-input__icon {
+            color: #666;
+        }
+        button {
+            width: 100%;
+        }
+
+        a {
+            text-decoration: none;
+            color: blue;
+            font-weight: bold;
+        }
+        .regBox {
+            font-size: 13px;
+            margin-top: 20px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="form-box">
+        <div style="text-align: center; font-weight: bold; color: #333; margin-bottom: 20px; font-size: 20px">Welcome to Restaurant Reservation System</div>
+        <el-form>
+            <el-form-item>
+                <el-input size="small" prefix-icon="el-icon-user" placeholder="please input name" v-model="form.yhm"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-input size="small" show-password prefix-icon="el-icon-lock" placeholder="please input password" v-model="form.mm"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-select size="small" style="width: 100%" placeholder="please choose role" v-model="form.role">
+					<el-option value="1" label="admin"></el-option>
+					<el-option value="2" label="user"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button size="small" type="danger" @click="login()">Login in</el-button>
+            </el-form-item>
+			<el-form-item class="regBox">
+				No account ？ <a href="javascript:void(0)" @click="navRegister()">Register</a>
+			</el-form-item>
+        </el-form>
+    </div>
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script src="/assets/js/vue.js"></script>
+<script src="/assets/js/element-ui.min.js"></script>
+<script src="/assets/js/axios.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            form: {}
+        },
+        mounted() {
+
+        },
+        methods: {
+            // 登录按钮点击事件入口
+            login() {
+                // 页面表单数据的输入校验
+                if (!this.form.yhm) {
+                    this.$notify.error("please input name");
+                    return;
+                }
+                if (!this.form.mm) {
+                    this.$notify.error("please input password");
+                    return;
+                }
+                if (!this.form.role) {
+                    this.$notify.error("please choose role");
+                    return;
+                }
+                // 调用后台登录接口
+                axios.post('/login', this.form).then(res => {
+                    if(res.data.code === '0') {
+                        // 将用户信息保存一份到浏览器缓存里
+                        localStorage.setItem('user', JSON.stringify(res.data.data));
+                        this.$notify.success("Login in success");
+                        setTimeout(function () {
+                            // 登录成功后跳转到Personal Info页
+                            goToPerson();
+                        }, 900)
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                });
+            },
+            navRegister() {
+                setTimeout(function () {
+                    location.href = '/end/register.html';
+                }, 900)
+            }
+        }
+    })
+</script>
+</body>
+</html>

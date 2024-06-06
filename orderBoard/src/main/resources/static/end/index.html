@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <link rel="stylesheet" href="/assets/css/element-ui.css">
+    <link rel="stylesheet" href="/assets/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/manager.css">
+    <style>
+        .image-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .image {
+            width: 30%;
+            margin: 5px;
+        }
+        .image-caption {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="app" v-cloak>
+
+    <!--头部-->
+    <div class="header" id="header"></div>
+    <!-- 中间部分-->
+    <div style="display: flex">
+        <!--菜单-->
+        <div id="main-menu"></div>
+
+        <!--主体-->
+        <div class="main-body">
+            <div class="main-body-header">Welcome to orderBoard System</div>
+            <div class="main-body-header">This is a system designed to manage orders efficiently. It provides a user-friendly interface for users to track and manage orders easily.</div>
+            <div class="main-body-header">Restaurant address:xxxx Contact number:xxxx</div>
+            <div class="image-container" style="display: flex; justify-content: center;">
+                <img src="../assets/imgs/index1.jpg" alt="Image 1" class="image">
+                <img src="../assets/imgs/index2.jpeg" alt="Image 2" class="image">
+                <img src="../assets/imgs/index3.jpg" alt="Image 3" class="image">
+            </div>
+            <div class="image-caption">Surroundings of our restaurant</div>
+            <div class="image-container">
+                <img src="../assets/imgs/index4.jpg" alt="Image 4" class="image">
+                <img src="../assets/imgs/index5.jpg" alt="Image 5" class="image">
+                <img src="../assets/imgs/index6.jpg" alt="Image 6" class="image">
+            </div>
+            <div class="image-caption">Popular dishes</div>
+        </div>
+    </div>
+
+
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script src="/assets/js/vue.js"></script>
+<script src="/assets/js/element-ui.min.js"></script>
+<script src="/assets/js/axios.js"></script>
+<script src="/assets/js/echarts.min.js"></script>
+
+<script>
+
+
+    new Vue({
+        // el：Vue的作用域，对应html中 id=app 的元素
+        el: '#app',
+        // data：定义页面所有需要绑定的变量
+        data() {
+            return {
+                user: {},
+                authority: [],
+                permission: [],
+                colWidth: 150,
+                activeIndex: 'index.html',
+            }
+        },
+        // mounted：页面dom元素初始化好之后做的事情
+        mounted() {
+            this.user = JSON.parse(localStorage.getItem('user'));
+            // 获取当前登录用户对该模块的所有权限
+            this.getRolePermission(1001);
+
+        },
+        // methods：本页面所有的点击事件或者其他函数定义区
+        methods: {
+            // 获取当前登录用户的所有权限
+            getRolePermission(modelId) {
+                axios.get('/authority/' + modelId).then(res => {
+                    if (res.data.code === "0") {
+                        this.authority = res.data.data.authority;
+                        this.permission = res.data.data.permission;
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                })
+            },
+            selectMenu(index) {
+                location.href = index
+            }
+        }
+    })
+</script>
+</body>
+</html>

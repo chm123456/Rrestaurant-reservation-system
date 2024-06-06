@@ -1,0 +1,42 @@
+#database configuration
+server:
+  port: 8080   #set server port
+  connection-timeout: 60000
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root  #mysql username
+    password: 123456   #mysql code
+    url: jdbc:mysql://localhost:3306/orderBoard?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
+  thymeleaf:
+    cache: false #Turn off cache
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+
+
+
+
+
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+logging:
+  file: log/my.log
+
+open:
+  browser:
+    url: 'http://localhost:8080/end/login.html'

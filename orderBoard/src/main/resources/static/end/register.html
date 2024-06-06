@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="/assets/css/element-ui.css">
+    <link rel="stylesheet" href="/assets/css/global.css">
+    <style>
+        body {
+            height: 100vh;
+            overflow: hidden;
+            background-image: url("../assets/imgs/bg.jpg");
+            background-size: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-box {
+            width: 350px;   /* Set the width of the form box */
+            padding: 20px 40px;
+            border-radius: 2px;
+            background-color: #ffffff;
+            opacity: .9;
+        }
+
+        .el-input__inner {
+            border-color: #ccc !important;
+            border-radius: 2px;
+            background-color: #ffffff !important;
+            color: #333;
+        }
+        .el-input__icon {
+            color: #666;
+        }
+        button {
+            width: 100%;
+        }
+
+        a {
+            text-decoration: none;
+            color: blue;
+            font-weight: bold;
+        }
+        .regBox {
+            font-size: 13px;
+            margin-top: 20px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="form-box">
+        <div style="text-align: center; font-weight: bold; color: #333; margin-bottom: 20px; font-size: 20px">Welcome Register</div>
+        <el-form>
+            <el-form-item>
+                <el-input size="small" prefix-icon="el-icon-user" placeholder="please input name" v-model="form.yhm"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-input size="small" show-password prefix-icon="el-icon-lock" placeholder="please input password" v-model="form.mm"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-input size="small" show-password prefix-icon="el-icon-lock" placeholder="please comfirm new password" v-model="form.nmm"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button size="small" type="danger" @click="register()">Register</el-button>
+            </el-form-item>
+			<el-form-item class="regBox">
+				has Account ？ <a href="javascript:void(0)" @click="navLogin()">Login in</a>
+			</el-form-item>
+        </el-form>
+    </div>
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script src="/assets/js/vue.js"></script>
+<script src="/assets/js/element-ui.min.js"></script>
+<script src="/assets/js/axios.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            form: {}
+        },
+        mounted() {
+
+        },
+        methods: {
+            // 注册按钮点击事件入口
+            register() {
+                // 页面表单数据的输入校验
+                if (!this.form.yhm) {
+                    this.$notify.error("please input name");
+                    return;
+                }
+                if (!this.form.mm) {
+                    this.$notify.error("please input password");
+                    return;
+                }
+                if (this.form.mm !== this.form.nmm) {
+                    this.$notify.error("The two password inputs are inconsistent");
+                    return;
+                }
+                this.form.role = 2;
+                // 调用后台注册接口
+                axios.post('/register', this.form).then(res => {
+                    if(res.data.code === '0') {
+                        // 将用户信息保存一份到浏览器缓存里
+                        localStorage.setItem('user', JSON.stringify(res.data.data));
+                        this.$notify.success("Register success！");
+                        setTimeout(function () {
+                            // 注册成功后跳转到登录页面
+                            window.location = '/end/login.html';
+                        }, 900);
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                });
+            },
+            navLogin() {
+                setTimeout(function () {
+                    location.href = '/end/login.html';
+                }, 900)
+            }
+        }
+    })
+</script>
+</body>
+</html>

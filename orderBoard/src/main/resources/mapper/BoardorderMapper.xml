@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.dao.BoardorderDao">
+
+    <select id="findBySearchCondition" resultType="com.example.entity.Boardorder">
+        select `boardorder`.*, `user`.`yhm` as name, `boardmanage`.`boardcode` as code from `boardorder`
+		left join `user` on `boardorder`.`userId` = `user`.id
+		left join `boardmanage` on `boardorder`.`boardmanageId` = `boardmanage`.id
+
+        where 1 = 1
+		<if test="role != null and role == 2">
+			and `boardorder`.`userId` = #{userId}
+		</if>
+
+    </select>
+
+</mapper>

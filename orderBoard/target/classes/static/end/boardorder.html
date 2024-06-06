@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BoardOrder</title>
+    <link rel="stylesheet" href="/assets/css/element-ui.css">
+    <link rel="stylesheet" href="/assets/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/manager.css">
+
+</head>
+<body>
+<div id="app" v-cloak>
+
+    <!--头部-->
+    <div class="header" id="header"></div>
+    <!-- 中间部分-->
+    <div style="display: flex">
+        <!--菜单-->
+        <div id="main-menu"></div>
+
+        <!--主体-->
+        <div class="main-body">
+            <div class="main-body-header">BoardOrder</div>
+            <div class="main-body-content">
+                <div>
+
+                </div>
+                <div class="main-table-box">
+                    <el-table style="width: 100%" :data="tableData" size="small" strip header-cell-class-name="tableHeaderClass" >
+                        <el-table-column label="code" prop="code"></el-table-column>
+                        <el-table-column label="name" prop="name"></el-table-column>
+                        <el-table-column label="phone" prop="phone"></el-table-column>
+                        <el-table-column label="operatetime" prop="operatetime"></el-table-column>
+                        <el-table-column label="time" prop="time"></el-table-column>
+                        <el-table-column label="numOfDiners" prop="numofdiners"></el-table-column>
+                        <el-table-column label="operate" :width="colWidth" fixed="right">
+                            <template v-slot="scope">
+                                <el-popconfirm title="Are you sure delete？" v-if="permission.includes(401)" @confirm="del(scope.row.id)"
+                                               confirm-button-text='OK'
+                                               cancel-button-text='No'
+                                >
+                                    <el-button size="small" type="danger" slot="reference">delete</el-button>
+                                </el-popconfirm>
+
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                <div style="margin: 20px 0">
+                    <el-pagination
+                            background
+                            @current-change="handleCurrentChange"
+                            :current-page="pageNum"
+                            :page-size="5"
+                            layout="total, prev, pager, next"
+                            :total="total">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    页脚-->
+    <div>
+        <el-dialog title="Please input information" :visible.sync="dialogVisible" width="40%">
+            <el-form :model="form" label-position="right" label-width="100px" style="padding-right: 40px">
+                <el-form-item label="code">
+                    <el-select size="small" style="width: 100%" v-model="form.code">
+                        <el-option v-for="item in boardmanageData" :value="item.id" :label="item.null" :key="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-if="user.role === 1" label="name">
+                    <el-select size="small" style="width: 100%" v-model="form.name">
+                        <el-option v-for="item in userData" :value="item.id" :label="item.yhm" :key="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="phone">
+                    <el-input size="small" v-model="form.phone" placeholder="please input phone"></el-input>
+                </el-form-item>
+                <el-form-item label="time">
+                    <el-date-picker v-model="form.time" type="datetime" clearable value-format="yyyy-MM-dd HH:mm:ss" placeholder="choose date" size="small" style="width: 100%;"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="numOfDiners">
+                    <el-input size="small" v-model="form.numofdiners" placeholder="please input numOfDiners"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button size="small" @click="dialogVisible = false">cancel</el-button>
+                <el-button size="small" type="primary" @click="save">save</el-button>
+            </div>
+        </el-dialog>
+
+    </div>
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script src="/assets/js/vue.js"></script>
+<script src="/assets/js/element-ui.min.js"></script>
+<script src="/assets/js/axios.js"></script>
+
+
+<script>
+    // BoardOrder模块接口请求统一前缀
+    let baseUrl = "/boardorder/"
+
+    new Vue({
+        // el：Vue的作用域，对应html中 id=app 的元素
+        el: '#app',
+        // data：定义页面所有需要绑定的变量
+        data() {
+            return {
+                user: {},
+                authority: [],
+                permission: [],
+                colWidth: 150,
+                activeIndex: 'boardorder.html',
+                tableData: [],
+                pageNum: 1,
+                dialogVisible: false,
+                modAudit: false,
+
+                search: {},
+                form: {
+
+                },
+                total: 0,
+                userData: [],
+                boardmanageData: [],
+
+            }
+        },
+        // mounted：页面dom元素初始化好之后做的事情
+        mounted() {
+            this.user = JSON.parse(localStorage.getItem('user'));
+            // 获取当前登录用户对该模块的所有权限
+            this.getRolePermission(4);
+            // 加载user
+            this.loadUser();
+            // 加载BoardManage
+            this.loadBoardmanage();
+
+        },
+        // methods：本页面所有的点击事件或者其他函数定义区
+        methods: {
+            operationSpace() {
+                let width = 0
+                let _this = this
+                setTimeout(() => {
+                    let rows = document.getElementsByClassName('el-table__row');
+                    if (rows && rows.length) {
+                        let tds = rows[0].getElementsByTagName('td')
+                        let btns = tds[tds.length - 1].getElementsByTagName('button')
+                        for (let i = 0; i <btns.length; i++) {
+                            width += btns[i].offsetWidth + 5
+                        }
+                        _this.colWidth = width
+                    }
+                }, 0)
+            },
+            // 获取当前登录用户的所有权限
+            getRolePermission(modelId) {
+                axios.get('/authority/' + modelId).then(res => {
+                    if (res.data.code === "0") {
+                        this.authority = res.data.data.authority;
+                        this.permission = res.data.data.permission;
+                        // 开始分页加载表格数据，默认从第一页开始加载
+                        this.load()
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                })
+            },
+            // 分页加载表格数据
+            load() {
+
+                axios.post(baseUrl + "page?pageNum=" + this.pageNum, this.search).then(res => {
+                    if (res.data.code === '0') {
+                        this.tableData = res.data.data.list;
+                        this.total = res.data.data.total;
+                        this.operationSpace();
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                });
+            },
+            // 新增初始化对话框
+            add() {
+                this.form = {};
+
+                this.dialogVisible = true;
+            },
+            // 编辑初始化模态框
+            edit(row) {
+                this.form = JSON.parse(JSON.stringify(row));
+
+                this.dialogVisible = true;
+            },
+
+            save() {
+
+                if (!this.form.id) {
+                    // 没有ID，说明是新增操作
+                    axios.post(baseUrl, this.form).then(res => {
+                        if (res.data.code === '0') {
+                            this.$notify.success('add success');
+                            this.dialogVisible = false;
+                            this.modAudit = false;
+                            this.load();
+                        } else {
+                            this.$notify.error(res.data.msg);
+                        }
+                    })
+                } else {
+                    // 有ID，说明是更新操作
+                    axios.put(baseUrl, this.form).then(res => {
+                        if (res.data.code === '0') {
+                            this.$notify.success('edit success');
+                            this.dialogVisible = false;
+                            this.modAudit = false;
+                            this.load();
+                        } else {
+                            this.$notify.error(res.data.msg);
+                        }
+                    })
+                }
+            },
+            // 根据ID删除某条数据
+            del(id) {
+                axios.delete(baseUrl + id).then(res => {
+                    if (res.data.code === '0') {
+                        this.$notify.success('delete success');
+                        this.load();
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                });
+            },
+            // 加载user
+            loadUser() {
+                axios.get("/user").then(res => {
+                    if (res.data.code === '0') {
+                        this.userData = res.data.data;
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                })
+            },
+            // 加载BoardManage
+            loadBoardmanage() {
+                axios.get("/boardmanage").then(res => {
+                    if (res.data.code === '0') {
+                        this.boardmanageData = res.data.data;
+                    } else {
+                        this.$notify.error(res.data.msg);
+                    }
+                })
+            },
+            initAudit(row) {
+                this.form = JSON.parse(JSON.stringify(row));
+                this.modAudit = true;
+            },
+
+            handleCurrentChange(pageNum) {
+                this.pageNum = pageNum;
+                this.load();
+            },
+            selectMenu(index) {
+                location.href = index
+            }
+        }
+    })
+</script>
+</body>
+</html>

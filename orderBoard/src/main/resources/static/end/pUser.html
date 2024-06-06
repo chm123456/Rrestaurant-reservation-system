@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Personal Info</title>
+    <link rel="stylesheet" href="/assets/css/element-ui.css">
+    <link rel="stylesheet" href="/assets/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/manager.css">
+
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <!--    头部-->
+    <div class="header" id="header"></div>
+    <!--    中间部分-->
+    <div style="display: flex">
+        <!--        菜单-->
+        <div id="main-menu"></div>
+        <!--        主体-->
+        <div class="main-body" style="z-index: 1000">
+            <div class="main-body-header">
+                Personal Info
+            </div>
+            <div class="main-body-content">
+                <div style="width: 50%; padding: 10px 0">
+                    <el-form :model="form" label-position="right" label-width="100px" style="padding-right: 40px">
+						<el-form-item label="name">
+							<el-input size="small" v-model="form.yhm" placeholder="please input name"></el-input>
+						</el-form-item>
+						<el-form-item label="avatar">
+							<el-upload action="http://localhost:8080/files/upload" ref="tx" :on-success="txSuccessUpload">
+								<el-button size="small" type="success">click upload</el-button>
+							</el-upload>
+						</el-form-item>
+						<el-form-item label="sex">
+							<el-radio-group size="small" v-model="form.sex">
+								<el-radio label="male"></el-radio>
+								<el-radio label="female"></el-radio>
+							</el-radio-group>
+						</el-form-item>
+						<el-form-item label="phone">
+							<el-input size="small" v-model="form.phone" placeholder="please input phone"></el-input>
+						</el-form-item>
+                        <div style="text-align: center; margin-top: 20px">
+                            <el-button size="small" type="primary" @click="update()">save</el-button>
+                        </div>
+                    </el-form>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <!--    页脚-->
+
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script src="/assets/js/vue.js"></script>
+<script src="/assets/js/element-ui.min.js"></script>
+<script src="/assets/js/axios.js"></script>
+
+<script>
+// 模块接口请求统一前缀
+let baseUrl = "/user/"
+new Vue({
+    // el：Vue的作用域，对应html中 id=app 的元素
+    el: '#app',
+    data() {
+        return {
+            user: {},
+            authority: [],
+            permission: [],
+            activeIndex: '',
+
+            form: {
+
+            }
+        }
+    },
+    mounted() {
+        this.user = JSON.parse(localStorage.getItem('user'));
+        // 获取当前登录用户对该模块的所有权限
+        this.getRolePermission(2);
+        // 初始化当前登录用户信息
+        this.getPerson();
+
+    },
+    methods: {
+        // 获取当前登录用户的所有权限
+        getRolePermission(modelId) {
+            axios.get('/authority/' + modelId).then(res => {
+                if (res.data.code === "0") {
+                    this.authority = res.data.data.authority;
+                    this.permission = res.data.data.permission;
+                } else {
+                    this.$notify.error(res.data.msg);
+                }
+            })
+        },
+
+        // 获取当前登录用户信息
+        getPerson() {
+            axios.get("/getUser").then(res => {
+                if (res.data.code === '0') {
+                    localStorage.setItem('user', JSON.stringify(res.data.data));
+                    this.form = res.data.data;
+                    this.user = JSON.parse(localStorage.getItem('user'));
+                } else {
+                    this.$notify.error(res.data.msg);
+                }
+            })
+        },
+
+        // 更新当前用户信息
+        update() {
+            axios.put(baseUrl, this.form).then(res => {
+                if (res.data.code === '0') {
+                    this.$notify.success("更新成功");
+                    this.getPerson();
+                } else {
+                    this.$notify.error(res.data.msg);
+                }
+            })
+        },
+		txSuccessUpload(res) {
+			this.form.tx = res.data;
+		},
+
+        selectMenu(index) {
+            location.href = index
+        }
+    }
+})
+</script>
+</body>
+</html>
